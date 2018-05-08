@@ -11,6 +11,13 @@
 <body>
     <div class="wrapper">
         <h1>Login and Registration</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="msg">{{message}}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <form action="/register" method="POST" class="register">
             <h2>Register here!</h2>
             <div class="form-group">
