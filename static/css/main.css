@@ -1,0 +1,38 @@
+*{
+    margin:0px;
+    padding:0px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 14px;
+}
+
+.wrapper{
+    width: 970px;
+    margin:auto;
+}
+
+h1{
+    font-size: 26px;
+    margin: 20px 0px 20px 0px;
+    width:900px;
+}
+
+h2{
+    font-size: 20px;
+}
+
+form{
+    display: inline-block;
+    width:40%;
+    vertical-align: top;   
+}
+
+.register{
+    margin-right:19%;
+}
+
+.msg{
+    display: inline-block;
+    vertical-align: top;
+    margin-left:20px;
+    color:darkred;
+}
