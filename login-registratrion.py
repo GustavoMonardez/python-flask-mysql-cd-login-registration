@@ -23,21 +23,32 @@ def register():
     lname = request.form["lname"]
     email = request.form["email"]
     password = request.form["password"]
-    cpassword = request.form["cpassword"]
+    cpassword = request.form["cpassword"]    
+    # check for empty fields
+    count = is_blank(fname,lname,email,password,cpassword)    
+    if count > 0:
+        return redirect("/")
+    # validate fields
+   
+    if not validate_data(fname,lname,email,password,cpassword):
+        return redirect("/")
     # check if account already registered
     check_email = "select email from users where email=%(email)s"
-    result = mysql.query_db(check_email, email)
+    email_data = {"email":email}
+    result = mysql.query_db(check_email, email_data)
+    print(result)
     if result:
         flash("Account already exists. Did you mean to log in?")
-        return redirect("/")\
-    # validate fields
-    validate_data(fname,lname,email,password,cpassword)
+        return redirect("/")
     # hash password
     password = bcrypt.generate_password_hash(password)  
     #insert data in database
     query = "insert into users(first_name,last_name,email,password) values(%(fname)s,%(lname)s,%(email)s,%(password)s);"
     data = {"fname":fname,"lname":lname,"email":email,"password":password}
     mysql.query_db(query, data)
+    # welcoming messages
+    session["username"]  = fname
+    flash("You've been successfully registered")
     #redirect to success page
     return redirect("/success")
 
@@ -50,52 +61,59 @@ def login():
     query = "select * from users where email = %(email)s;"
     data = { "email" : email }
     result = mysql.query_db(query, data)
+    print(result)
     if result:
         if bcrypt.check_password_hash(result[0]["password"], password):
-            session['userid'] = result[0]['id']
+            session["username"] = result[0]["first_name"]
+            return redirect("/success")
     # either password or user name is incorrect
     flash("You could not be logged in")
     return redirect("/")
 
 @app.route("/success")
 def success():
+    if "username" not in session:
+        flash("You must be logged in to access this page")
+        return redirect("/")
     return render_template("success.html")
 
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return redirect("/")
+
 def validate_data(fname,lname,email,password,cpassword):
-    # check for empty fields
-    count = is_blank(fname,lname,email,password,cpassword)    
-    if count > 0:
-        return redirect("/")
     # check first and last names contain only letters
     if not fname.isalpha():
         flash("first name cannot contain numbers")
-        return redirect("/")
+        return False
     if not lname.isalpha():
         flash("last name cannot contain numbers")
-        return redirect("/")
+        return False
     # check first and last names are at least 2 characters long
     if len(fname) < 2:
         flash("first name must contain at least  characters")
-        return redirect("/")
+        return False
     if len(lname) < 2:
         flash("last name must contain at least  characters")
-        return redirect("/")
+        return False
     # check password length at least 8 characters long
     if len(password) < 8:
         flash("password has to be at least 8 characters long")
-        return redirect("/")
+        return False
     # email validation
     EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
     if len(email) < 1:
         flash("Email cannot be blank!")
-        return redirect("/")
+        return False
     elif not EMAIL_REGEX.match(email):
         flash("Invalid Email Address!")
-        return redirect("/")
+        return False
     # password match
     if password != cpassword:
         flash("password must match")
-        return redirect("/")
+        return False
+    return True
 
 def is_blank(fname,lname,email,cpassword,password):
     count = 0

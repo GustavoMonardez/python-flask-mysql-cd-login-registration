@@ -12,11 +12,13 @@
     <div class="wrapper">
         <h1>Login and Registration</h1>
         {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="msg">{{message}}</div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        <div class="register-error">
+            {% for message in messages %}
+                <p>{{message}}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endwith %}
         <form action="/register" method="POST" class="register">
             <h2>Register here!</h2>
@@ -40,7 +42,7 @@
                 <label for="cpassword">Confirm Password:</label>
                 <input type="password" name="cpassword" class="form-control" value="{{session['name']}}">
             </div>
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" class="btn btn-success">Register</button>
         </form>
         <form action="/login" method="POST" class="login">
             <h2>Login here!</h2>
@@ -54,15 +56,6 @@
             </div>
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
-        <div class="msg">
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            {% for message in messages %}
-                <p>{{message}}</p>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-        </div>
     </div>
 </body>
 </html>
